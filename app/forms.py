@@ -1,9 +1,35 @@
-from flask_wtf import FlaskForm#从flask_wtf包中导入FlaskForm类
-from wtforms import StringField,PasswordField,BooleanField,SubmitField#导入这些类
-from wtforms.validators import DataRequired
+from flask_wtf import FlaskForm  # 从flask_wtf包中导入FlaskForm类
+from wtforms import StringField, PasswordField, BooleanField, SubmitField  # 导入这些类
+from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
+
+# 登录
+from app.models import User
+
 
 class LoginForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired()])
-	password = PasswordField('Password', validators=[DataRequired()])
-	remember_me = BooleanField('Remember Me')
-	submit = SubmitField('Sign In')
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')
+
+
+# 注册表单
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = StringField('Password', validators=[DataRequired()])
+    password2 = StringField('Password2', validators=[DataRequired(), EqualTo('password')])
+
+    submit = SubmitField('Register-注册')
+
+    # 验证用户名是否存在
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first
+        if user is not None:
+            raise ValidationError("Please use a  differnce username")
+
+    # 验证email名是否存在
+    def validate_username(self, username):
+        user = User.query.filter_by(email=username.mail).first
+        if user is not None:
+            raise ValidationError("Please use a  differnce email")
