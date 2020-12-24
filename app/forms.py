@@ -35,6 +35,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Please use a  differnce email")
 
 
+# 编辑个人主页表单
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('About_me', validators=[Length(min=0, max=140)])
@@ -50,3 +51,7 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
                 raise ValidationError('Please use a different username.')
+
+
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')
