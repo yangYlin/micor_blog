@@ -1,10 +1,12 @@
 from datetime import datetime
 from hashlib import md5
+from time import time
 
+import jwt
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import db, login
+from app import db, login, app
 
 
 @login.user_loader
@@ -69,6 +71,21 @@ class User(UserMixin, db.Model):  # 混入类，有4个常用的字段
             followers.c.follower_id == self.id)  # 我关注的人所以帖子
         own = Post.query.filter_by(user_id=self.id)  # 自己帖子
         return followed.union(own).order_by(Post.timestamp.desc())  # 2个UNION拼接
+
+    # 得到加密后的参数
+    def get_reset_password_token(self, expires_in=600):  # 超期时间，600s
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').encode('utf-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return '密码被破坏'
+        return User.query.get(id)
 
 
 class Post(db.Model):

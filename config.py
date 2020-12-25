@@ -12,7 +12,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/flask_micor_blog'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    POST_PER_PAGE = 3
+    POSTS_PER_PAGE = 3
 
     # 从env文件里面读
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
